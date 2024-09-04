@@ -163,12 +163,12 @@
 			// Extract latitude and longitude from the API response
 			var latitude = parseFloat(data.field1);
 			var longitude = parseFloat(data.field2);
-			var hum  = parseFloat(data.field3);
-			var temp = parseFloat(data.field4);
+			var spd  = parseFloat(data.field3);
+			var alt = parseFloat(data.field4);
 			var batt = parseFloat(data.field5);
 			var timestamp = data.created_at;
-			hum  = hum.toFixed(2);
-			temp = temp.toFixed(2);
+			spd  = hum.toFixed(2);
+			alt = temp.toFixed(2);
 			batt = batt.toFixed(2);
 			
 			var date_ = timestamp.split('T'), //buat split tanggal sama jam ==> 2020-03-11T21:32:27+07:00
@@ -179,8 +179,8 @@
             document.getElementById('longitude').textContent =  longitude.toFixed(6);
 			document.getElementById('time_date').textContent =  date_now;
             document.getElementById('time_time').textContent =  time_now;
-			document.getElementById('temperature').textContent =  temp;
-            document.getElementById('humidity').textContent =  hum;
+			document.getElementById('speed').textContent =  spd;
+            document.getElementById('altitude').textContent =  alt;
 			document.getElementById('battery').textContent =  batt;
 
 			// Update markers
@@ -196,7 +196,7 @@
 			map.panTo([latitude, longitude]);
 		}
 		
-		function updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now) {
+		function updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now) {
 		    var customPopup="<b>Stored Data<br>"+date_now+" "+time_now+"</b><br><b>Temperature: </b>"+temp+" Celcius<br><b>Humidity: </b>"+hum+" %<br><b>Battery: </b>"+batt+" %";
             var marker;// = isPolylineStarted ? updatedMarker.addTo(map) : initialMarker.addTo(map);
 			
@@ -262,8 +262,8 @@
             document.getElementById('longitude').textContent = "";
 			document.getElementById('time_date').textContent =  "";
             document.getElementById('time_time').textContent =  "";
-			document.getElementById('temperature').textContent =  "";
-            document.getElementById('humidity').textContent =  "";
+			document.getElementById('speed').textContent =  "";
+            document.getElementById('altitude').textContent =  "";
 			document.getElementById('battery').textContent =  "";
             initialMarker = L.marker([0, 0], {icon: redIcon});
 			updatedMarker = L.marker([0, 0], {icon: blueIcon});
