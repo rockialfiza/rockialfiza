@@ -186,7 +186,7 @@
 			updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now);
 			if (stat_btn == 1) {
 				// Update polyline
-				polyline.addLatLng([latitude, longitude, speed, altitude]);
+				polyline.addLatLng([latitude, longitude]);
 				//polyline.setLatLngs([latitude, longitude, speed, altitude]);
 				polyline.addTo(map);
 			}
@@ -208,14 +208,14 @@
 			if (stat_btn == 2){
 				marker = finishMarker.addTo(map);
             }
-            marker.setLatLng([latitude, longitude, speed, altitude]).update();
+            marker.setLatLng([latitude, longitude]).update();
             //marker.bindPopup(`Timestamp: ${timestamp}`);
 			marker.bindPopup(customPopup).addTo(map);
-            map.setView([latitude, longitude, speed, altitude], map.getZoom());
+            map.setView([latitude, longitude], map.getZoom());
         }
 		
 		function updatePolyline(data) {
-            var coordinates = data.map(location => [location.lat, location.lng, speed.spd, altitude.alt]);
+            var coordinates = data.map(location => [location.lat, location.lng]);
             polyline.setLatLngs(coordinates);
             if (stat_btn == 1) {
                 polyline.addTo(map);
