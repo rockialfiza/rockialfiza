@@ -59,11 +59,11 @@
 									</tr> 
 									<tr> 
 										<td>Latitude</td> 
-										<td>: <a id="latitude"></a> </td> 
+										<td>: <a id="latitude"></a></td> 
 									</tr> 
 									<tr> 
 										<td>Longitude</td> 
-										<td>: <a id="longitude"></a> </td> 
+										<td>: <a id="longitude"></a></td> 
 									</tr> 
 									<tr> 
 										<td>Battery</td> 
@@ -192,7 +192,7 @@
 			}
 
 			// Center the map on the updated location
-			map.panTo([latitude, longitude, speed, altitude]);
+			map.panTo([latitude, longitude]);
 		}
 		
 		function updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now) {
