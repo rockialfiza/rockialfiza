@@ -184,11 +184,11 @@
 			document.getElementById('battery').textContent =  batt;
 
 			// Update markers
-			updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now);
+			updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now);
 			if (stat_btn == 1) {
 				// Update polyline
-				polyline.addLatLng([latitude, longitude]);
-				//polyline.setLatLngs([latitude, longitude]);
+				polyline.addLatLng([latitude, longitude, spd, alt, batt]);
+				//polyline.setLatLngs([latitude, longitude, spd, alt, batt]);
 				polyline.addTo(map);
 			}
 
