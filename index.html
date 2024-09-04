@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-	<style>	#map {height: 500px;}</style>
+    <style>
+        #map { height: 500px; }
+    </style>
 </head>
 <body>
     <!-- Top Navigation Bar -->
@@ -26,7 +28,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
                     </li>
-                    <!-- Add more navigation items as needed -->
                 </ul>
             </div>
         </div>
@@ -44,54 +45,46 @@
                         <h5 class="card-title">Last Data Received</h5>
                     </div>
                     <div class="card-body">
-						<div class="row">
-							<table class="table table-borderless"> 
-								<tbody> 
-									<tr> 
-										<td style="width: 20%;">Date</td> 
-										<td>: <a id="time_date"></a></td> 
-									</tr> 
-									<tr> 
-										<td>Time</td> 
-										<td>: <a id="time_time"></a></td> 
-									</tr> 
-									<tr> 
-									</tr> 
-									<tr> 
-										<td>Latitude</td> 
-										<td>: <a id="latitude"></a> </td> 
-									</tr> 
-									<tr> 
-										<td>Longitude</td> 
-										<td>: <a id="longitude"></a> </td> 
-									</tr> 
-									<tr> 
-										<td>Speed</td> 
-										<td>: <a id="speed"></a> m/s</td>
-									</tr> 
-									<tr> 
-									</tr> 
-									<tr> 
-										<td>Elevation</td> 
-										<td>: <a id="elevation"> m</a> </td> 
-									</tr> 
-									<tr> 
-										
-										<td>Battery</td> 
-										<td>: <a id="battery"></a> %</td>  
-									</tr> 
-								</tbody> 
-							</table>
-						</div>
-						<div class="row">
-							<div class="col-md-5">
-								<button id="startPolylineButton" class="btn btn-success">Start Tracking</button>
-							</div>
-							<div class="col-md-3">
-								<button type="button" class="btn btn-primary" id="resetButton" style="display: none;" >Reset</button>
-							</div>
-							
-						</div>
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 20%;">Date</td>
+                                    <td>: <span id="time_date"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Time</td>
+                                    <td>: <span id="time_time"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Latitude</td>
+                                    <td>: <span id="latitude"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Longitude</td>
+                                    <td>: <span id="longitude"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Speed</td>
+                                    <td>: <span id="speed"></span> m/s</td>
+                                </tr>
+                                <tr>
+                                    <td>Altitude</td>
+                                    <td>: <span id="altitude"></span> m</td>
+                                </tr>
+                                <tr>
+                                    <td>Battery</td>
+                                    <td>: <span id="battery"></span> %</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <button id="startPolylineButton" class="btn btn-success">Start Tracking</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary" id="resetButton" style="display: none;">Reset</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,13 +93,11 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Bootstrap JS (optional) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
     <script>
         var map = L.map('map').setView([0, 0], 15);
-		
-		//https://github.com/pointhi/leaflet-color-markers
         var blueIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -123,174 +114,109 @@
             popupAnchor: [1, -34],
             shadowSize: [41, 41]
         });
-		
-		var greenIcon = new L.Icon({
-			iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-			iconSize: [25, 41],
-			iconAnchor: [12, 41],
-			popupAnchor: [1, -34],
-			shadowSize: [41, 41]
-		});
-
-		var orangeIcon = new L.Icon({
-			iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-			iconSize: [25, 41],
-			iconAnchor: [12, 41],
-			popupAnchor: [1, -34],
-			shadowSize: [41, 41]
-		});
-		
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
         var initialMarker = L.marker([0, 0], {icon: redIcon});
         var updatedMarker = L.marker([0, 0], {icon: blueIcon});
-        var finishMarker = L.marker([0, 0], {icon: greenIcon}); 
+        var finishMarker = L.marker([0, 0], {icon: greenIcon});
         var polyline = L.polyline([], { color: 'blue' });
         var startPolylineButton = document.getElementById('startPolylineButton');
-		var resetButton = document.getElementById('resetButton');
-        var isPolylineStarted = false;
-        var locationData = [];
-        var currentIndex = 0;
-        var polylineIndex = 0;
-		var stat_btn = 0;
-		
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var resetButton = document.getElementById('resetButton');
+        var stat_btn = 0;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-		
-		function updateMap(data) {
-			// Extract latitude and longitude from the API response
-			var latitude = parseFloat(data.field1);
-			var longitude = parseFloat(data.field2);
-			var spd  = parseFloat(data.field3);
-			var alt = parseFloat(data.field4);
-			var batt = parseFloat(data.field5);
-			var timestamp = data.created_at;
-			spd  = hum.toFixed(2);
-			alt = temp.toFixed(2);
-			batt = batt.toFixed(2);
-			
-			var date_ = timestamp.split('T'), //buat split tanggal sama jam ==> 2020-03-11T21:32:27+07:00
-				date_now = date_[0], time_z = date_[1];
-			var time_ = time_z.split('+'), time_now=time_[0]; // buat menghilangkan GMT +7
-			
-			document.getElementById('latitude').textContent =  latitude.toFixed(6);
-            document.getElementById('longitude').textContent =  longitude.toFixed(6);
-			document.getElementById('time_date').textContent =  date_now;
-            document.getElementById('time_time').textContent =  time_now;
-			document.getElementById('speed').textContent =  spd;
-            document.getElementById('altitude').textContent =  alt;
-			document.getElementById('battery').textContent =  batt;
+        function updateMap(data) {
+            var latitude = parseFloat(data.field1);
+            var longitude = parseFloat(data.field2);
+            var spd = parseFloat(data.field3).toFixed(2);
+            var alt = parseFloat(data.field4).toFixed(2);
+            var batt = parseFloat(data.field5).toFixed(2);
+            var timestamp = data.created_at;
 
-			// Update markers
-			updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now);
-			if (stat_btn == 1) {
-				// Update polyline
-				polyline.addLatLng([latitude, longitude, spd, alt, batt]);
-				//polyline.setLatLngs([latitude, longitude, spd, alt, batt]);
-				polyline.addTo(map);
-			}
+            var dateSplit = timestamp.split('T');
+            var date_now = dateSplit[0];
+            var time_now = dateSplit[1].split('+')[0];
 
-			// Center the map on the updated location
-			map.panTo([latitude, longitude]);
-		}
-		
-		function updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now) {
-		    var customPopup="<b>Stored Data<br>"+date_now+" "+time_now+"</b><br><b>Temperature: </b>"+temp+" Celcius<br><b>Humidity: </b>"+hum+" %<br><b>Battery: </b>"+batt+" %";
-            var marker;// = isPolylineStarted ? updatedMarker.addTo(map) : initialMarker.addTo(map);
-			
-			if (stat_btn == 0) {
-				marker = initialMarker.addTo(map);
-            }
-			if (stat_btn == 1){
-				marker = updatedMarker.addTo(map);
-            }
-			if (stat_btn == 2){
-				marker = finishMarker.addTo(map);
-            }
-            marker.setLatLng([latitude, longitude]).update();
-            //marker.bindPopup(`Timestamp: ${timestamp}`);
-			marker.bindPopup(customPopup).addTo(map);
-            map.setView([latitude, longitude], map.getZoom());
-        }
-		
-		function updatePolyline(data) {
-            var coordinates = data.map(location => [location.lat, location.lng]);
-            polyline.setLatLngs(coordinates);
-            if (stat_btn == 1) {
+            document.getElementById('latitude').textContent = latitude.toFixed(6);
+            document.getElementById('longitude').textContent = longitude.toFixed(6);
+            document.getElementById('time_date').textContent = date_now;
+            document.getElementById('time_time').textContent = time_now;
+            document.getElementById('speed').textContent = spd;
+            document.getElementById('altitude').textContent = alt;
+            document.getElementById('battery').textContent = batt;
+
+            updateMarker(latitude, longitude, date_now, time_now, spd, alt, batt);
+
+            if (stat_btn === 1) {
+                polyline.addLatLng([latitude, longitude]);
                 polyline.addTo(map);
             }
+
+            map.panTo([latitude, longitude]);
         }
-		
-        function startPolyline() {
-			if (stat_btn == 0) {
-                //isPolylineStarted = true;
-				stat_btn=1;
-                polylineIndex = currentIndex;
-                startPolylineButton.textContent = 'Stop';
-                startPolylineButton.classList.remove('btn-success');
-                startPolylineButton.classList.add('btn-danger');
-				resetButton.style.display = 'none'; // Hide reset button when starting polyline
-            } else if (stat_btn == 1){
-                //isPolylineStarted = false;
-				stat_btn=2;
-                startPolylineButton.textContent = 'Start Tracking';
-                startPolylineButton.classList.remove('btn-danger');
-                startPolylineButton.classList.add('btn-success');
-				startPolylineButton.disabled = true;
-				resetButton.style.display = 'block'; // Show reset button when stopping polyline
-            }else{
-				stat_btn=0;
-                startPolylineButton.textContent = 'Start Polyline';
-                startPolylineButton.classList.remove('btn-default');
-                startPolylineButton.classList.add('btn-success');
-			}
-			console.log('Button Status:', stat_btn); 
-		
+
+        function updateMarker(latitude, longitude, date_now, time_now, spd, alt, batt) {
+            var customPopup = "<b>Stored Data<br>" + date_now + " " + time_now + "</b><br><b>Speed: </b>" + spd + " m/s<br><b>Altitude: </b>" + alt + " m<br><b>Battery: </b>" + batt + " %";
+            var marker;
+
+            if (stat_btn === 0) {
+                marker = initialMarker.addTo(map);
+            } else if (stat_btn === 1) {
+                marker = updatedMarker.addTo(map);
+            } else if (stat_btn === 2) {
+                marker = finishMarker.addTo(map);
+            }
+
+            marker.setLatLng([latitude, longitude]).bindPopup(customPopup).update();
         }
-		
-		function resetMap() {
-			stat_btn=0;
-            map.eachLayer(function (layer) {
-                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-                    map.removeLayer(layer);
-                }
-            });
-			startPolylineButton.disabled = false;
-			document.getElementById('latitude').textContent = "";
-            document.getElementById('longitude').textContent = "";
-			document.getElementById('time_date').textContent =  "";
-            document.getElementById('time_time').textContent =  "";
-			document.getElementById('speed').textContent =  "";
-            document.getElementById('altitude').textContent =  "";
-			document.getElementById('battery').textContent =  "";
-            initialMarker = L.marker([0, 0], {icon: redIcon});
-			updatedMarker = L.marker([0, 0], {icon: blueIcon});
-			finishMarker = L.marker([0, 0], {icon: greenIcon}); 
+
+        startPolylineButton.addEventListener('click', function () {
+            if (stat_btn === 0) {
+                stat_btn = 1;
+                startPolylineButton.textContent = 'Stop Tracking';
+                startPolylineButton.className = 'btn btn-danger';
+            } else if (stat_btn === 1) {
+                stat_btn = 2;
+                startPolylineButton.textContent = 'Finish';
+                startPolylineButton.className = 'btn btn-secondary';
+                resetButton.style.display = 'block';
+            }
+        });
+
+        resetButton.addEventListener('click', function () {
+            map.removeLayer(polyline);
             polyline = L.polyline([], { color: 'blue' });
+            initialMarker.setLatLng([0, 0]).removeFrom(map);
+            updatedMarker.setLatLng([0, 0]).removeFrom(map);
+            finishMarker.setLatLng([0, 0]).removeFrom(map);
+            stat_btn = 0;
+            startPolylineButton.textContent = 'Start Tracking';
+            startPolylineButton.className = 'btn btn-success';
             resetButton.style.display = 'none';
-            fetchData(); // Fetch new location data after reset
+            fetchData(); 
+        });
+
+        async function fetchData() {
+            try {
+                const response = await fetch('https://api.thingspeak.com/channels/YourChannelID/feeds.json?results=1'); // Replace with your ThingSpeak URL
+                const json = await response.json();
+                const data = json.feeds[0];
+                updateMap(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
 
-		function fetchData() {
-			// Make an API request to obtain location data
-			fetch('https://api.thingspeak.com/channels/2644921/feeds/last.json?timezone=Asia%2FJakarta&api_key=2TC5NE9QERU3R4W2')
-			  .then(response => response.json())
-			  .then(data => {
-				updateMap(data);
-			  })
-			  .catch(error => console.error('Error fetching data:', error));
-		}
-
-		// Update the map every X milliseconds
-		setInterval(fetchData, 5000); // Set the interval according to your requirements
-
-		// Initial fetch when the page loads
-		fetchData();
-
-        startPolylineButton.addEventListener('click', startPolyline);
-		resetButton.addEventListener('click', resetMap);
+        setInterval(fetchData, 5000); // Fetch data every 5 seconds
     </script>
 </body>
 </html>
