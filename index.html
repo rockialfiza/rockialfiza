@@ -1,296 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPS Tracking</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-	<style>	#map {height: 500px;}</style>
-</head>
-<body>
-    <!-- Top Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">GPS Tracking</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <!-- Add more navigation items as needed -->
-                </ul>
-            </div>
-        </div>
-    </nav>
+#include <WiFi.h>
+#include "ThingSpeak.h"
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include "DHT.h"
+#include <TinyGPS++.h>
 
-    <!-- Main Content -->
-    <div class="container-fluid mt-4">
-        <div class="row">
-            <div class="col-lg-8">
-                <div id="map"></div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">Last Data Received</h5>
-                    </div>
-                    <div class="card-body">
-						<div class="row">
-							<table class="table table-borderless"> 
-								<tbody> 
-									<tr> 
-										<td style="width: 20%;">Date</td> 
-										<td>: <a id="time_date"></a></td> 
-									</tr> 
-									<tr> 
-										<td>Time</td> 
-										<td>: <a id="time_time"></a></td> 
-									</tr> 
-									<tr> 
-									</tr> 
-									<tr> 
-										<td>Latitude</td> 
-										<td>: <a id="latitude"></a> C</td> 
-									</tr> 
-									<tr> 
-										<td>Longitude</td> 
-										<td>: <a id="longitude"></a> %</td> 
-									</tr> 
-									<tr> 
-										<td>Speed</td> 
-										<td>: <a id="speed"></a></td>
-									</tr> 
-									<tr> 
-									</tr> 
-									<tr> 
-										<td>Elevation</td> 
-										<td>: <a id="elevation"></a> </td> 
-									</tr> 
-									<tr> 
-										
-										<td>Battery</td> 
-										<td>: <a id="battery"></a> %</td>  
-									</tr> 
-								</tbody> 
-							</table>
-						</div>
-						<div class="row">
-							<div class="col-md-5">
-								<button id="startPolylineButton" class="btn btn-success">Start Tracking</button>
-							</div>
-							<div class="col-md-3">
-								<button type="button" class="btn btn-primary" id="resetButton" style="display: none;" >Reset</button>
-							</div>
-							
-						</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+void ConnectWIFI();
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Bootstrap JS (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-    <script>
-        var map = L.map('map').setView([0, 0], 15);
-		
-		//https://github.com/pointhi/leaflet-color-markers
-        var blueIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        var redIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-		
-		var greenIcon = new L.Icon({
-			iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-			iconSize: [25, 41],
-			iconAnchor: [12, 41],
-			popupAnchor: [1, -34],
-			shadowSize: [41, 41]
-		});
+#define DHTPIN 4      // Pin ESP yang tersambung ke pin Data DHT22 (pin 2)
+#define DHTTYPE DHT22 // jenis sensor DHT 22  (AM2302), AM2321
 
-		var orangeIcon = new L.Icon({
-			iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-			iconSize: [25, 41],
-			iconAnchor: [12, 41],
-			popupAnchor: [1, -34],
-			shadowSize: [41, 41]
-		});
-		
-        var initialMarker = L.marker([0, 0], {icon: redIcon});
-        var updatedMarker = L.marker([0, 0], {icon: blueIcon});
-        var finishMarker = L.marker([0, 0], {icon: greenIcon}); 
-        var polyline = L.polyline([], { color: 'blue' });
-        var startPolylineButton = document.getElementById('startPolylineButton');
-		var resetButton = document.getElementById('resetButton');
-        var isPolylineStarted = false;
-        var locationData = [];
-        var currentIndex = 0;
-        var polylineIndex = 0;
-		var stat_btn = 0;
-		
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+DHT dht(DHTPIN, DHTTYPE);
 
-		
-		function updateMap(data) {
-			// Extract latitude and longitude from the API response
-			var latitude = parseFloat(data.field1);
-			var longitude = parseFloat(data.field2);
-			var hum  = parseFloat(data.field3);
-			var temp = parseFloat(data.field4);
-			var batt = parseFloat(data.field5);
-			var timestamp = data.created_at;
-			hum  = hum.toFixed(2);
-			temp = temp.toFixed(2);
-			batt = batt.toFixed(2);
-			
-			var date_ = timestamp.split('T'), //buat split tanggal sama jam ==> 2020-03-11T21:32:27+07:00
-				date_now = date_[0], time_z = date_[1];
-			var time_ = time_z.split('+'), time_now=time_[0]; // buat menghilangkan GMT +7
-			
-			document.getElementById('latitude').textContent =  latitude.toFixed(6);
-            document.getElementById('longitude').textContent =  longitude.toFixed(6);
-			document.getElementById('time_date').textContent =  date_now;
-            document.getElementById('time_time').textContent =  time_now;
-			document.getElementById('temperature').textContent =  temp;
-            document.getElementById('humidity').textContent =  hum;
-			document.getElementById('battery').textContent =  batt;
+float hum = 0;  // variabel untuk menyimpan nilai kelembaban
+float temp = 0; // variabel untuk menyimpan nilai suhu
+float hic = 0;  // heat index dalam celcius
+float batt = 100;
 
-			// Update markers
-			updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now);
-			if (stat_btn == 1) {
-				// Update polyline
-				polyline.addLatLng([latitude, longitude]);
-				//polyline.setLatLngs([latitude, longitude]);
-				polyline.addTo(map);
-			}
+TinyGPSPlus gps; // the TinyGPS++ object
+String lat_data, lng_data, spd_data, elev_data;
+#define GPS_BAUDRATE 9600
 
-			// Center the map on the updated location
-			map.panTo([latitude, longitude]);
-		}
-		
-		function updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now) {
-		    var customPopup="<b>Stored Data<br>"+date_now+" "+time_now+"</b><br><b>Temperature: </b>"+temp+" Celcius<br><b>Humidity: </b>"+hum+" %<br><b>Battery: </b>"+batt+" %";
-            var marker;// = isPolylineStarted ? updatedMarker.addTo(map) : initialMarker.addTo(map);
-			
-			if (stat_btn == 0) {
-				marker = initialMarker.addTo(map);
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
+
+char ssid[] = "iPhone Rocki"; // Wokwi Wifi
+char pass[] = "1234567890";            // Blank Password
+int keyIndex = 0;            // your network key Index number (needed only for WEP)
+WiFiClient client;
+
+unsigned long myChannelNumber = 2644921;
+const char *myWriteAPIKey = "72T0QMT7FRMM3GTB";
+
+unsigned long previousMillis_ts = 0;
+unsigned long previousMillis_display = 0;
+
+const long ts_update_interval = 20000; // update data setiap 10s
+const long display_interval = 1000;
+
+// 'thermometer', 55x55px
+const unsigned char thermo[] PROGMEM = {
+    0x00, 0x00, 0x00, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xff, 0x80, 0x00, 0x00, 0x00, 0x00,
+    0x07, 0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x07, 0x83, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x01,
+    0xe0, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0xe0, 0x00,
+    0x00, 0x00, 0x00, 0x0e, 0x00, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00,
+    0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c,
+    0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0,
+    0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00,
+    0x00, 0x00, 0x0c, 0x00, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00,
+    0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1f,
+    0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x38, 0x60, 0x00,
+    0x00, 0x00, 0x00, 0x0c, 0x7c, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00,
+    0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c,
+    0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60,
+    0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00,
+    0x00, 0x00, 0x0c, 0xfe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x1c, 0xfe, 0x70, 0x00, 0x00, 0x00, 0x00,
+    0x3c, 0xfe, 0x78, 0x00, 0x00, 0x00, 0x00, 0x7c, 0xfe, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xff,
+    0xbc, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xfe, 0x00, 0x00, 0x00, 0x00, 0xf7, 0xff, 0xde, 0x00,
+    0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xef, 0xff, 0xef, 0x00, 0x00, 0x00,
+    0x00, 0xef, 0xff, 0xef, 0x00, 0x00, 0x00, 0x00, 0xef, 0xff, 0xef, 0x00, 0x00, 0x00, 0x00, 0xef,
+    0xff, 0xef, 0x00, 0x00, 0x00, 0x00, 0xef, 0xff, 0xef, 0x00, 0x00, 0x00, 0x00, 0xef, 0xff, 0xef,
+    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xf7, 0xff, 0xde, 0x00, 0x00,
+    0x00, 0x00, 0xfb, 0xff, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x7d, 0xff, 0x3c, 0x00, 0x00, 0x00, 0x00,
+    0x7e, 0xfe, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x3f, 0x01, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xff,
+    0xf0, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0x00, 0x00,
+    0x00};
+
+// 'wifi connected', 16x16px
+const unsigned char wifi_icon[] PROGMEM = {
+    0x00, 0x00, 0x00, 0x00, 0x07, 0xe0, 0x1f, 0xf8, 0x7c, 0x3e, 0xe7, 0xe7, 0xdf, 0xfb, 0x39, 0x1c,
+    0x37, 0xec, 0x0f, 0xf0, 0x0f, 0xf0, 0x03, 0xc0, 0x03, 0xc0, 0x01, 0x80, 0x00, 0x00, 0x00, 0x00};
+
+// 'wifi disconnected', 16x16px
+const unsigned char wifi_dc[] PROGMEM = {
+    0x00, 0x00, 0x00, 0x04, 0x03, 0xce, 0x1f, 0xdc, 0x7f, 0xba, 0xf8, 0x77, 0x60, 0xe6, 0x05, 0xc0,
+    0x0b, 0xb0, 0x07, 0x70, 0x0e, 0x20, 0x1c, 0x00, 0x1b, 0x80, 0x03, 0xc0, 0x01, 0x80, 0x00, 0x00};
+
+const unsigned char Update_OK[] PROGMEM = {
+    0x01, 0x80, 0x0f, 0xf2, 0x10, 0x18, 0x20, 0x0c, 0x40, 0x1e, 0x40, 0x32, 0x40, 0x62, 0x84, 0x63,
+    0x83, 0xc3, 0x41, 0x82, 0x40, 0x02, 0x40, 0x06, 0x20, 0x04, 0x10, 0x08, 0x0e, 0x70, 0x01, 0x80};
+
+const unsigned char Update_NOK[] PROGMEM = {
+    0x01, 0x80, 0x0e, 0x70, 0x10, 0x08, 0x20, 0x04, 0x48, 0x32, 0x44, 0x62, 0xc2, 0xc2, 0x81, 0x82,
+    0x83, 0x82, 0xc6, 0x42, 0x4c, 0x22, 0x48, 0x16, 0x20, 0x04, 0x10, 0x18, 0x0e, 0xf0, 0x01, 0x80};
+
+void setup()
+{
+    Serial.begin(9600);
+    Serial2.begin(GPS_BAUDRATE); // serial2 for GPS UART
+    //Serial.println(F("Temp & Humid Monitoring System"));
+    //dht.begin();
+
+    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
+    {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;)
+            ;
+    }
+
+    // just intro
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.setCursor(38, 20);
+    display.println(F("ThingSpeak"));
+    display.setCursor(25, 35);
+    display.println(F("Temp-Hum Monitor"));
+    display.display(); // tampilkan data
+    delay(3000);
+    ConnectWIFI();
+    ThingSpeak.begin(client); // Initialize ThingSpeak
+}
+
+void loop()
+{
+    if (Serial2.available() > 0)
+    {
+        if (gps.encode(Serial2.read()))
+        {
+            if (gps.location.isValid())
+            {
+                Serial.print(F("Latitude: "));
+                Serial.print(gps.location.lat(), 6);
+                lat_data = String(gps.location.lat(), 8);
+
+                Serial.print(F(" , Longitude: "));
+                Serial.println(gps.location.lng(), 6);
+                lng_data = String(gps.location.lng(), 8);
+
+                Serial.print(F(" , Speed: "));
+                Serial.println(gps.speed.mps(), 6);
+                spd_data = String(gps.speed.mps(), 8);
+
+                Serial.print(F(" , Altitude: "));
+                Serial.println(gps.altitude.meters(), 6);
+                lng_data = String(gps.altitude.meters(), 8);
             }
-			if (stat_btn == 1){
-				marker = updatedMarker.addTo(map);
+            else
+            {
+                Serial.println(F("Location: INVALID"));
             }
-			if (stat_btn == 2){
-				marker = finishMarker.addTo(map);
-            }
-            marker.setLatLng([latitude, longitude]).update();
-            //marker.bindPopup(`Timestamp: ${timestamp}`);
-			marker.bindPopup(customPopup).addTo(map);
-            map.setView([latitude, longitude], map.getZoom());
+            // Serial.println();
         }
-		
-		function updatePolyline(data) {
-            var coordinates = data.map(location => [location.lat, location.lng]);
-            polyline.setLatLngs(coordinates);
-            if (stat_btn == 1) {
-                polyline.addTo(map);
-            }
+    }
+
+    // if (millis() > 5000 && gps.charsProcessed() < 10)
+    //   Serial.println(F("No GPS data received: check wiring"));
+
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis_display >= display_interval)
+    {
+        previousMillis_display = currentMillis;
+
+        // hum = dht.readHumidity();
+        // temp = dht.readTemperature(); // membaca suhu dalam Celsius
+
+        // temp = dht.readTemperature(true);  //suhu dalam Fahrenheit
+
+        // Check if any reads failed and exit early (to try again).
+        // if (isnan(hum) || isnan(temp))
+        // {
+        //     Serial.println(F("Gagal mendapat data dari sensor DHT!"));
+        //     return;
+        // }
+        display.clearDisplay();
+        display.drawBitmap(0, 5, thermo, 55, 55, WHITE);
+        display.setTextSize(1);
+        display.setCursor(55, 25);
+        display.print(temp);
+        display.print(" C");
+        display.setCursor(55, 40);
+        display.print(hum);
+        display.print(" %");
+
+        if (WiFi.status() != WL_CONNECTED)
+        {
+            display.drawBitmap(110, 0, wifi_dc, 16, 16, WHITE);
         }
-		
-        function startPolyline() {
-			if (stat_btn == 0) {
-                //isPolylineStarted = true;
-				stat_btn=1;
-                polylineIndex = currentIndex;
-                startPolylineButton.textContent = 'Stop';
-                startPolylineButton.classList.remove('btn-success');
-                startPolylineButton.classList.add('btn-danger');
-				resetButton.style.display = 'none'; // Hide reset button when starting polyline
-            } else if (stat_btn == 1){
-                //isPolylineStarted = false;
-				stat_btn=2;
-                startPolylineButton.textContent = 'Start Tracking';
-                startPolylineButton.classList.remove('btn-danger');
-                startPolylineButton.classList.add('btn-success');
-				startPolylineButton.disabled = true;
-				resetButton.style.display = 'block'; // Show reset button when stopping polyline
-            }else{
-				stat_btn=0;
-                startPolylineButton.textContent = 'Start Polyline';
-                startPolylineButton.classList.remove('btn-default');
-                startPolylineButton.classList.add('btn-success');
-			}
-			console.log('Button Status:', stat_btn); 
-		
+        else
+        {
+            display.drawBitmap(110, 0, wifi_icon, 16, 16, WHITE);
         }
-		
-		function resetMap() {
-			stat_btn=0;
-            map.eachLayer(function (layer) {
-                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-                    map.removeLayer(layer);
+    }
+
+    if (currentMillis - previousMillis_ts >= ts_update_interval)
+    {
+        previousMillis_ts = currentMillis;
+        if (WiFi.status() != WL_CONNECTED)
+        {
+            Serial.print("Attempting to connect to SSID: ");
+            Serial.println(ssid);
+            WiFi.begin(ssid, pass);
+            int i = 0;
+            while (WiFi.status() != WL_CONNECTED)
+            {
+                delay(500);
+                Serial.print(".");
+                ++i;
+
+                if (i == 20)
+                {
+                    i = 0;
+                    Serial.println("\n Failed to Connect.");
+                    break;
                 }
-            });
-			startPolylineButton.disabled = false;
-			document.getElementById('latitude').textContent = "";
-            document.getElementById('longitude').textContent = "";
-			document.getElementById('time_date').textContent =  "";
-            document.getElementById('time_time').textContent =  "";
-			document.getElementById('temperature').textContent =  "";
-            document.getElementById('humidity').textContent =  "";
-			document.getElementById('battery').textContent =  "";
-            initialMarker = L.marker([0, 0], {icon: redIcon});
-			updatedMarker = L.marker([0, 0], {icon: blueIcon});
-			finishMarker = L.marker([0, 0], {icon: greenIcon}); 
-            polyline = L.polyline([], { color: 'blue' });
-            resetButton.style.display = 'none';
-            fetchData(); // Fetch new location data after reset
+            }
         }
 
-		function fetchData() {
-			// Make an API request to obtain location data
-			fetch('https://api.thingspeak.com/channels/2644921/feeds/last.json?timezone=Asia%2FJakarta&api_key=2TC5NE9QERU3R4W2')
-			  .then(response => response.json())
-			  .then(data => {
-				updateMap(data);
-			  })
-			  .catch(error => console.error('Error fetching data:', error));
-		}
+        ThingSpeak.setField(1, lat_data); // field latitude
+        ThingSpeak.setField(2, lng_data);
+        // ThingSpeak.setField(3, hum);  // field humidity
+        // ThingSpeak.setField(4, temp); // field temperature
+        ThingSpeak.setField(5, batt);
+        // write to the ThingSpeak channel
+        int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
+        if (x == 200)
+        {
+            Serial.println("Sukses Update Chanel.");
+            display.drawBitmap(90, 0, Update_OK, 16, 16, WHITE);
+        }
+        else
+        {
+            Serial.println("Update Chanel Bermasalah. HTTP error code " + String(x));
+            display.drawBitmap(90, 0, Update_NOK, 16, 16, WHITE);
+        }
+        Serial.println();
+        batt = batt - 0.5;
+    }
 
-		// Update the map every X milliseconds
-		setInterval(fetchData, 5000); // Set the interval according to your requirements
+    display.display();
+}
 
-		// Initial fetch when the page loads
-		fetchData();
+void ConnectWIFI()
+{
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print("Attempting to connect to SSID: ");
+        Serial.println(ssid);
+        // WiFi.mode(WIFI_STA);
+        WiFi.begin(ssid, pass); // Untuk Simulasi >> Spesifik channel 6
+        int i = 0;
+        int a = 0;
+        while (WiFi.status() != WL_CONNECTED)
+        {
+            Serial.print(".");
+            display.clearDisplay();
+            display.setTextSize(1);
+            if (a == 0)
+            {
+                display.drawBitmap(52, 15, wifi_icon, 16, 16, WHITE);
+                a = 1;
+            }
+            else
+            {
+                display.drawBitmap(52, 15, wifi_icon, 16, 16, BLACK);
+                a = 0;
+            }
+            display.setCursor(25, 38);
+            display.print("Connecting ...");
+            display.display();
+            delay(1000);
+            ++i;
+            if (i == 30)
+            {
+                i = 0;
+                Serial.println("\n Failed to Connect.");
+                break;
+            }
+        }
 
-        startPolylineButton.addEventListener('click', startPolyline);
-		resetButton.addEventListener('click', resetMap);
-    </script>
-</body>
-</html>
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            Serial.println("\n Connected!");
+            display.clearDisplay();
+            display.setTextSize(1);
+            display.drawBitmap(52, 15, wifi_icon, 16, 16, WHITE);
+            display.setCursor(33, 38);
+            display.print("Connected!");
+            display.display();
+        }
+        else
+        {
+            display.clearDisplay();
+            display.setTextSize(1);
+            display.drawBitmap(52, 15, wifi_dc, 16, 16, WHITE);
+            display.setCursor(20, 38);
+            display.print("Wifi Connection");
+            display.setCursor(36, 48);
+            display.print("Failed!");
+            display.display();
+        }
+        delay(3000);
+    }
+}
