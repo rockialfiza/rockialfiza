@@ -21,7 +21,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#">Home</a>
                     </li>
@@ -45,38 +45,40 @@
                         <h5 class="card-title">Last Data Received</h5>
                     </div>
                     <div class="card-body">
-                        <table class="table table-borderless">
-                            <tbody>
-                                <tr>
-                                    <td style="width: 20%;">Date</td>
-                                    <td>: <span id="time_date"></span></td>
-                                </tr>
-                                <tr>
-                                    <td>Time</td>
-                                    <td>: <span id="time_time"></span></td>
-                                </tr>
-                                <tr>
-                                    <td>Latitude</td>
-                                    <td>: <span id="latitude"></span></td>
-                                </tr>
-                                <tr>
-                                    <td>Longitude</td>
-                                    <td>: <span id="longitude"></span></td>
-                                </tr>
-                                <tr>
-                                    <td>Speed</td>
-                                    <td>: <span id="speed"></span> m/s</td>
-                                </tr>
-                                <tr>
-                                    <td>Altitude</td>
-                                    <td>: <span id="altitude"></span> m</td>
-                                </tr>
-                                <tr>
-                                    <td>Battery</td>
-                                    <td>: <span id="battery"></span> %</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="row">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 20%;">Date</td>
+                                        <td>: <span id="time_date"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Time</td>
+                                        <td>: <span id="time_time"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Latitude</td>
+                                        <td>: <span id="latitude"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Longitude</td>
+                                        <td>: <span id="longitude"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Speed</td>
+                                        <td>: <span id="speed"></span> m/s</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Altitude</td>
+                                        <td>: <span id="altitude"></span> m</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Battery</td>
+                                        <td>: <span id="battery"></span> %</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="row">
                             <div class="col-md-5">
                                 <button id="startPolylineButton" class="btn btn-success">Start Tracking</button>
@@ -93,39 +95,22 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JS (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    
     <script>
         var map = L.map('map').setView([0, 0], 15);
-        var blueIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        var redIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        var greenIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        var initialMarker = L.marker([0, 0], {icon: redIcon});
-        var updatedMarker = L.marker([0, 0], {icon: blueIcon});
-        var finishMarker = L.marker([0, 0], {icon: greenIcon});
+
+        var redIcon = new L.Icon({ /* Red Icon Configuration */ });
+        var blueIcon = new L.Icon({ /* Blue Icon Configuration */ });
+        var greenIcon = new L.Icon({ /* Green Icon Configuration */ });
+        
+        var initialMarker = L.marker([0, 0], { icon: redIcon });
+        var updatedMarker = L.marker([0, 0], { icon: blueIcon });
+        var finishMarker = L.marker([0, 0], { icon: greenIcon });
         var polyline = L.polyline([], { color: 'blue' });
+
         var startPolylineButton = document.getElementById('startPolylineButton');
         var resetButton = document.getElementById('resetButton');
         var stat_btn = 0;
@@ -141,21 +126,18 @@
             var alt = parseFloat(data.field4).toFixed(2);
             var batt = parseFloat(data.field5).toFixed(2);
             var timestamp = data.created_at;
-
-            var dateSplit = timestamp.split('T');
-            var date_now = dateSplit[0];
-            var time_now = dateSplit[1].split('+')[0];
+            var [date_now, time_now] = timestamp.split('T');
 
             document.getElementById('latitude').textContent = latitude.toFixed(6);
             document.getElementById('longitude').textContent = longitude.toFixed(6);
             document.getElementById('time_date').textContent = date_now;
-            document.getElementById('time_time').textContent = time_now;
+            document.getElementById('time_time').textContent = time_now.split('+')[0];
             document.getElementById('speed').textContent = spd;
             document.getElementById('altitude').textContent = alt;
             document.getElementById('battery').textContent = batt;
 
             updateMarker(latitude, longitude, date_now, time_now, spd, alt, batt);
-
+            
             if (stat_btn === 1) {
                 polyline.addLatLng([latitude, longitude]);
                 polyline.addTo(map);
@@ -165,58 +147,69 @@
         }
 
         function updateMarker(latitude, longitude, date_now, time_now, spd, alt, batt) {
-            var customPopup = "<b>Stored Data<br>" + date_now + " " + time_now + "</b><br><b>Speed: </b>" + spd + " m/s<br><b>Altitude: </b>" + alt + " m<br><b>Battery: </b>" + batt + " %";
-            var marker;
+            var marker = (stat_btn === 0) ? initialMarker : (stat_btn === 1) ? updatedMarker : finishMarker;
+            var customPopup = `<b>Stored Data</b><br>${date_now} ${time_now}<br><b>Speed:</b> ${spd} m/s<br><b>Altitude:</b> ${alt} m<br><b>Battery:</b> ${batt}%`;
 
-            if (stat_btn === 0) {
-                marker = initialMarker.addTo(map);
-            } else if (stat_btn === 1) {
-                marker = updatedMarker.addTo(map);
-            } else if (stat_btn === 2) {
-                marker = finishMarker.addTo(map);
-            }
-
-            marker.setLatLng([latitude, longitude]).bindPopup(customPopup).update();
+            marker.setLatLng([latitude, longitude]).bindPopup(customPopup).addTo(map);
+            map.setView([latitude, longitude], map.getZoom());
         }
 
-        startPolylineButton.addEventListener('click', function () {
+        function startPolyline() {
             if (stat_btn === 0) {
                 stat_btn = 1;
                 startPolylineButton.textContent = 'Stop Tracking';
-                startPolylineButton.className = 'btn btn-danger';
+                startPolylineButton.classList.replace('btn-success', 'btn-danger');
+                resetButton.style.display = 'none';
             } else if (stat_btn === 1) {
                 stat_btn = 2;
-                startPolylineButton.textContent = 'Finish';
-                startPolylineButton.className = 'btn btn-secondary';
+                startPolylineButton.textContent = 'Start Tracking';
+                startPolylineButton.classList.replace('btn-danger', 'btn-success');
+                startPolylineButton.disabled = true;
                 resetButton.style.display = 'block';
-            }
-        });
-
-        resetButton.addEventListener('click', function () {
-            map.removeLayer(polyline);
-            polyline = L.polyline([], { color: 'blue' });
-            initialMarker.setLatLng([0, 0]).removeFrom(map);
-            updatedMarker.setLatLng([0, 0]).removeFrom(map);
-            finishMarker.setLatLng([0, 0]).removeFrom(map);
-            stat_btn = 0;
-            startPolylineButton.textContent = 'Start Tracking';
-            startPolylineButton.className = 'btn btn-success';
-            resetButton.style.display = 'none';
-            fetchData(); 
-        });
-
-        async function fetchData() {
-            try {
-                const response = await fetch('https://api.thingspeak.com/channels/YourChannelID/feeds.json?results=1'); // Replace with your ThingSpeak URL
-                const json = await response.json();
-                const data = json.feeds[0];
-                updateMap(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            } else {
+                stat_btn = 0;
+                startPolylineButton.textContent = 'Start Tracking';
+                startPolylineButton.classList.replace('btn-secondary', 'btn-success');
             }
         }
 
-        setInterval(fetchData, 5000); // Fetch data every 5 seconds
+        function resetMap() {
+            stat_btn = 0;
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            startPolylineButton.disabled = false;
+            document.getElementById('latitude').textContent = "";
+            document.getElementById('longitude').textContent = "";
+            document.getElementById('time_date').textContent = "";
+            document.getElementById('time_time').textContent = "";
+            document.getElementById('speed').textContent = "";
+            document.getElementById('altitude').textContent = "";
+            document.getElementById('battery').textContent = "";
+
+            initialMarker = L.marker([0, 0], { icon: redIcon });
+            updatedMarker = L.marker([0, 0], { icon: blueIcon });
+            finishMarker = L.marker([0, 0], { icon: greenIcon });
+            polyline = L.polyline([], { color: 'blue' });
+            resetButton.style.display = 'none';
+            fetchData();
+        }
+
+        function fetchData() {
+            fetch('https://api.thingspeak.com/channels/2644921/feeds/last.json?timezone=Asia%2FJakarta&api_key=2TC5NE9QERU3R4W2')
+                .then(response => response.json())
+                .then(data => updateMap(data))
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        setInterval(fetchData, 5000); // Set the interval according to your requirements
+        fetchData();
+
+        startPolylineButton.addEventListener('click', startPolyline);
+        resetButton.addEventListener('click', resetMap);
     </script>
 </body>
 </html>
