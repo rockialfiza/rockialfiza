@@ -58,12 +58,12 @@
 									<tr> 
 									</tr> 
 									<tr> 
-										<td>Temperature</td> 
-										<td>: <a id="temperature"></a> C</td> 
+										<td>Latitude</td> 
+										<td>: <a id="latitude"></a> C</td> 
 									</tr> 
 									<tr> 
-										<td>Humidity</td> 
-										<td>: <a id="humidity"></a> %</td> 
+										<td>Longitude</td> 
+										<td>: <a id="longitude"></a> %</td> 
 									</tr> 
 									<tr> 
 										<td>Battery</td> 
@@ -72,12 +72,12 @@
 									<tr> 
 									</tr> 
 									<tr> 
-										<td>Latitude</td> 
-										<td>: <a id="latitude"></a> </td> 
+										<td>Speed</td> 
+										<td>: <a id="speed"></a> </td> 
 									</tr> 
 									<tr> 
-										<td>Longitude</td> 
-										<td>: <a id="longitude"></a></td> 
+										<td>Altitude</td> 
+										<td>: <a id="altitude"></a></td> 
 									</tr> 
 								</tbody> 
 							</table>
@@ -162,12 +162,12 @@
 			// Extract latitude and longitude from the API response
 			var latitude = parseFloat(data.field1);
 			var longitude = parseFloat(data.field2);
-			var hum  = parseFloat(data.field3);
-			var temp = parseFloat(data.field4);
+			var spd  = parseFloat(data.field3);
+			var alt = parseFloat(data.field4);
 			var batt = parseFloat(data.field5);
 			var timestamp = data.created_at;
-			hum  = hum.toFixed(2);
-			temp = temp.toFixed(2);
+			spd  = spd.toFixed(2);
+			alt = alt.toFixed(2);
 			batt = batt.toFixed(2);
 			
 			var date_ = timestamp.split('T'), //buat split tanggal sama jam ==> 2020-03-11T21:32:27+07:00
@@ -178,25 +178,25 @@
             document.getElementById('longitude').textContent =  longitude.toFixed(6);
 			document.getElementById('time_date').textContent =  date_now;
             document.getElementById('time_time').textContent =  time_now;
-			document.getElementById('temperature').textContent =  temp;
-            document.getElementById('humidity').textContent =  hum;
+			document.getElementById('speed').textContent =  spd;
+            document.getElementById('altitude').textContent =  alt;
 			document.getElementById('battery').textContent =  batt;
 
 			// Update markers
-			updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now);
+			updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now);
 			if (stat_btn == 1) {
 				// Update polyline
-				polyline.addLatLng([latitude, longitude]);
-				//polyline.setLatLngs([latitude, longitude]);
+				polyline.addLatLng([latitude, longitude, speed, altitude]);
+				//polyline.setLatLngs([latitude, longitude, speed, altitude]);
 				polyline.addTo(map);
 			}
 
 			// Center the map on the updated location
-			map.panTo([latitude, longitude]);
+			map.panTo([latitude, longitude, speed, altitude]);
 		}
 		
-		function updateMarker(hum, temp, batt, latitude, longitude, date_now, time_now) {
-		    var customPopup="<b>Stored Data<br>"+date_now+" "+time_now+"</b><br><b>Temperature: </b>"+temp+" Celcius<br><b>Humidity: </b>"+hum+" %<br><b>Battery: </b>"+batt+" %";
+		function updateMarker(spd, alt, batt, latitude, longitude, date_now, time_now) {
+		    var customPopup="<b>Stored Data<br>"+date_now+" "+time_now+"</b><br><b>speed: </b>"+spd+" m/s<br><b>altitude: </b>"+alt+" %<br><b>Battery: </b>"+batt+" %";
             var marker;// = isPolylineStarted ? updatedMarker.addTo(map) : initialMarker.addTo(map);
 			
 			if (stat_btn == 0) {
@@ -208,14 +208,14 @@
 			if (stat_btn == 2){
 				marker = finishMarker.addTo(map);
             }
-            marker.setLatLng([latitude, longitude]).update();
+            marker.setLatLng([latitude, longitude, speed, altitude]).update();
             //marker.bindPopup(`Timestamp: ${timestamp}`);
 			marker.bindPopup(customPopup).addTo(map);
-            map.setView([latitude, longitude], map.getZoom());
+            map.setView([latitude, longitude, speed, altitude], map.getZoom());
         }
 		
 		function updatePolyline(data) {
-            var coordinates = data.map(location => [location.lat, location.lng]);
+            var coordinates = data.map(location => [location.lat, location.lng, speed.spd, altitude.alt]);
             polyline.setLatLngs(coordinates);
             if (stat_btn == 1) {
                 polyline.addTo(map);
@@ -261,8 +261,8 @@
             document.getElementById('longitude').textContent = "";
 			document.getElementById('time_date').textContent =  "";
             document.getElementById('time_time').textContent =  "";
-			document.getElementById('temperature').textContent =  "";
-            document.getElementById('humidity').textContent =  "";
+			document.getElementById('speed').textContent =  "";
+            document.getElementById('altitude').textContent =  "";
 			document.getElementById('battery').textContent =  "";
             initialMarker = L.marker([0, 0], {icon: redIcon});
 			updatedMarker = L.marker([0, 0], {icon: blueIcon});
