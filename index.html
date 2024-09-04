@@ -20,7 +20,7 @@ float hic = 0;  // heat index dalam celcius
 float batt = 100;
 
 TinyGPSPlus gps; // the TinyGPS++ object
-String lat_data, lng_data, spd_data, elev_data;
+String lat_data, lng_data, spd_data, alt_data;
 #define GPS_BAUDRATE 9600
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -138,7 +138,7 @@ void loop()
 
                 Serial.print(F(" , Altitude: "));
                 Serial.println(gps.altitude.meters(), 6);
-                lng_data = String(gps.altitude.meters(), 8);
+                alt_data = String(gps.altitude.meters(), 8);
             }
             else
             {
@@ -212,10 +212,10 @@ void loop()
         }
 
         ThingSpeak.setField(1, lat_data); // field latitude
-        ThingSpeak.setField(2, lng_data);
-        // ThingSpeak.setField(3, hum);  // field humidity
-        // ThingSpeak.setField(4, temp); // field temperature
-        ThingSpeak.setField(5, batt);
+        ThingSpeak.setField(2, lng_data); // field longitude
+        ThingSpeak.setField(3, spd_data);  // field speed
+        ThingSpeak.setField(4, alt_data); // field altitude
+        ThingSpeak.setField(5, batt); // field battery
         // write to the ThingSpeak channel
         int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
         if (x == 200)
